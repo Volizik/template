@@ -1,9 +1,50 @@
 <html>
 <head>
-<link rel="stylesheet" href="css/style.css"/>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimal-ui"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<link rel="stylesheet" href="css/styles.css" type="text/css"/>
 </head>
 <body>
-  <p>hello</p>
-  <div class="some-class">hello world</div>
+<div class="app">
+<header class="header">
+<div class="container">
+<h2 class="header__title">Todo List
+</h2>
+</div>
+</header>
+<div class="app__body">
+<div class="container">
+<aside class="sidebar"><input class="sidebar__title" type="text" placeholder="Title"/><input class="sidebar__date" type="text" placeholder="Date"/><textarea class="sidebar__desc" placeholder="Description"></textarea>
+<div class="sidebar__actions">
+<button class="sidebar__button sidebar__del">Del
+</button>
+<button class="sidebar__button sidebar__save">Add/Save
+</button>
+</div>
+</aside>
+<main class="main" role="main">
+<nav class="main__buttons">
+<button class="main__button main__button--active">№1
+</button>
+<button class="main__button">№2
+</button>
+<button class="main__button">№3
+</button>
+<button class="main__button">№4
+</button>
+<button class="main__button">№5
+</button>
+<button class="main__button">№6
+</button>
+</nav>
+<div class="main__body">
+</div>
+</main>
+</div>
+</div>
+<footer class="footer">
+</footer>
+</div>
 </body>
 </html>

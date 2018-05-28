@@ -11,11 +11,6 @@ const gulp = require('gulp'),
       gulpPugBeautify = require('gulp-pug-beautify'),
       autoprefixer = require('gulp-autoprefixer');
 
-gulp.task('sass', function() {
-  return gulp.src('./src/sass/styles.sass')
-    .pipe(sass().on('error', sass.logError))
-    .pipe(gulp.dest('./dist/css'));
-});
 
 gulp.task('pug', function() {
   return gulp.src('./src/pug/pages/*.pug')
@@ -27,10 +22,10 @@ gulp.task('pug', function() {
 
 gulp.task('css', function() {
 
-  gulp.src('./src/sass/style.sass')
+  gulp.src('./src/sass/styles.sass')
     .pipe(plumber())
     .pipe(sourcemaps.init())
-    .pipe(sass({outputStyle: 'expanded'}))
+    .pipe(sass({outputStyle: 'compressed'}))
     .pipe(sourcemaps.write())
     .pipe(autoprefixer({
       browsers: ['> 1%', 'last 5 versions', 'Android >= 3', 'Firefox ESR', 'Opera 12.1']
@@ -62,7 +57,7 @@ gulp.task('browser-sync', function() { // Создаем таск browser-sync
   });
 });
 
-gulp.task('watch', ['pug', 'sass'], function() {
+gulp.task('watch', ['pug', 'css'], function() {
 
   gulp.watch('./src/pug/**/*.pug', ['pug']);
   gulp.watch('./src/sass/*.sass', ['css']);
