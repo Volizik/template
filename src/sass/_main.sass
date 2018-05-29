@@ -7,8 +7,12 @@
     margin-top: 10px
     overflow-y: hidden
     display: flex
+    align-items: center
     width: 100%
     max-width: 498px
+  &__tabs
+    display: flex
+    flex-grow: 1
   &__button
     margin: 5px
     width: 100%
@@ -20,6 +24,20 @@
     cursor: pointer
     &--active
       background-color: transparent
+  &__btn-new
+    margin: 10px
+    display: flex
+    align-items: center
+    justify-content: center
+    width: 40px
+    height: 40px
+    font-size: 32px
+    color: #fff
+    background-color: #94c11e
+    border: none
+    border-radius: 5px
+    cursor: pointer
+    flex-shrink: 0
   &__body
     margin: 10px
     flex-grow: 1
