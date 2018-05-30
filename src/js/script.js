@@ -1,3 +1,23 @@
+// Storage
+let storage = JSON.parse(localStorage.getItem('notes')) || [];
+
+function showCurrentNote(note) {
+  const body = document.querySelector('.main__body');
+  body.innerHTML = `
+            <h3>${note.title} <span>${note.date}</span></h3>
+            <p>${note.desc}</p>
+        `
+}
+function showNote(el) {
+  const id = el.getAttribute('id');
+  storage.forEach((note) => {
+    if (note.id === Number(id)) {
+      showCurrentNote(note);
+      console.log(note);
+    }
+  })
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // Fields
@@ -8,12 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn = document.querySelector('.sidebar__save');
     const newBtn = document.querySelector('.main__btn-new');
     const delBtn = document.querySelector('.sidebar__del');
+    let tabs;
     // Body
     const body = document.querySelector('.main__body');
     const tabsList = document.querySelector('.main__tabs');
-    let tabs = null;
-    // Storage
-    let storage = JSON.parse(localStorage.getItem('notes')) || [];
+
     let newNote = {
         id: Math.random(),
         title: titleField.value,
@@ -41,27 +60,27 @@ document.addEventListener('DOMContentLoaded', () => {
         arr.push(newNote);
         localStorage.clear();
         localStorage.setItem('notes', JSON.stringify(arr));
-        storage = JSON.parse(localStorage.getItem('notes'))
+        storage = JSON.parse(localStorage.getItem('notes'));
+        createTabs()
     }
 
     function createTabs() {
-        storage.forEach((note, index) => {
+        const stor = JSON.parse(localStorage.getItem('notes')) || [];
+        tabsList.innerHTML = '';
+        stor.forEach((note, index) => {
             tabsList.innerHTML += `<button 
                                     class="main__button ${storage.length - 1 === index ? 'main__button--active' : ''}" 
-                                    id=${note.id}>№${index + 1}
+                                    id=${note.id}
+                                    onclick="showNote(event.target)"
+                                    >№${index + 1} 
                                     </button>`;
         });
-        tabs = document.querySelectorAll('.main__button');
+        tabs = document.querySelector('.main__tab');
+
+        const active = document.querySelector('.main__button--active');
+        active.click()
     }
 
-    function showNote(el) {
-        const id = el.getAttribute('id');
-        storage.forEach((note, index) => {
-            if (note.id === id) {
-                console.log(note)
-            }
-        })
-    }
 
     init();
 
@@ -69,11 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         saveNote()
     });
 
-    newBtn.addEventListener('click', () => {
 
-    });
 
-    tabs.addEventListener('click', function (event) {
-        showNote(event.target)
-    })
 });
