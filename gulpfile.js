@@ -50,14 +50,14 @@ gulp.task('browser-sync', function() { // Создаем таск browser-sync
     server: {
       baseDir: "./dist"
     },
-    tunnel: true,
+    tunnel: false,
     host: 'localhost',
     port: 9000,
     logPrefix: "Frontend_Devil"
   });
 });
 
-gulp.task('watch', ['pug', 'css'], function() {
+gulp.task('watch', ['pug', 'css', 'js'], function() {
 
   gulp.watch('./src/pug/**/*.pug', ['pug']);
   gulp.watch('./src/sass/*.sass', ['css']);
