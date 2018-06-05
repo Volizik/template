@@ -13,10 +13,20 @@ var Todo = function () {
             titleField: document.querySelector('.sidebar__title'),
             dateField: document.querySelector('.sidebar__date'),
             descField: document.querySelector('.sidebar__desc'),
+            // Buttons
+            saveBtn: document.querySelector('.sidebar__save'),
+            delBtn: document.querySelector('.sidebar__del'),
+            newNoteBtn: document.querySelector('.main__btn-new'),
             // Body
             body: document.querySelector('.main__body'),
             tabsList: document.querySelector('.main__tabs')
         };
+        this.options.tabsList.addEventListener('click', this.clickToTab.bind(this));
+        this.options.newNoteBtn.addEventListener('click', this.createNewNote.bind(this));
+        this.options.saveBtn.addEventListener('click', this.saveNewNote.bind(this));
+        this.options.delBtn.addEventListener('click', this.deleteNote.bind(this));
+
+        this.initTabs();
     }
 
     _createClass(Todo, [{
@@ -38,6 +48,8 @@ var Todo = function () {
             var active = document.querySelector('.main__button--active');
             if (active) {
                 active.click();
+                var id = active.getAttribute('id');
+                this.showCurrentNoteInfo(id);
             } else {
                 this.createNewNote();
             }
@@ -52,12 +64,13 @@ var Todo = function () {
             this.options.titleField.value = '';
             this.options.dateField.value = '';
             this.options.descField.value = '';
+            this.options.body.innerHTML = '';
             this.options.tabsList.innerHTML += '<button class="main__button main__button--active">New note</button>';
         }
     }, {
         key: 'saveNewNote',
         value: function saveNewNote() {
-            var arr = JSON.parse(localStorage.getItem('notes')) || [];
+            var arr = this.getNotes();
             var newNote = {
                 id: Math.random(),
                 title: this.options.titleField.value,
@@ -74,7 +87,7 @@ var Todo = function () {
         value: function deleteNote() {
             var activeBtn = document.querySelector('.main__button--active');
             var noteId = activeBtn.getAttribute('id');
-            var arr = JSON.parse(localStorage.getItem('notes'));
+            var arr = this.getNotes();
             var result = arr.filter(function (item) {
                 return item.id !== Number(noteId);
             });
@@ -84,8 +97,23 @@ var Todo = function () {
         }
     }, {
         key: 'showCurrentNoteInfo',
-        value: function showCurrentNoteInfo(note) {
-            this.options.body.innerHTML = '\n            <h3>' + note.title + ' <span>' + note.date + '</span></h3>\n            <p>' + note.desc + '</p>\n        ';
+        value: function showCurrentNoteInfo(id) {
+            var storage = this.getNotes();
+            var currentNote = storage.find(function (item) {
+                return item.id === Number(id);
+            });
+            this.options.body.innerHTML = '\n            <h3>' + currentNote.title + ' <span>' + currentNote.date + '</span></h3>\n            <p>' + currentNote.desc + '</p>\n        ';
+        }
+    }, {
+        key: 'clickToTab',
+        value: function clickToTab(event) {
+            if (event.target.classList.contains('main__button')) {
+                var id = event.target.getAttribute('id');
+                var active = document.querySelector('.main__button--active');
+                active.classList.remove('main__button--active');
+                event.target.classList.add('main__button--active');
+                this.showCurrentNoteInfo(id);
+            }
         }
     }]);
 
@@ -93,15 +121,7 @@ var Todo = function () {
 }();
 
 document.addEventListener('DOMContentLoaded', function () {
-    var saveBtn = document.querySelector('.sidebar__save');
-    var delBtn = document.querySelector('.sidebar__del');
-    var newNoteBtn = document.querySelector('.main__btn-new');
-    var todo = new Todo();
-
-    todo.initTabs();
-    newNoteBtn.addEventListener('click', todo.createNewNote.bind(todo));
-    saveBtn.addEventListener('click', todo.saveNewNote.bind(todo));
-    delBtn.addEventListener('click', todo.deleteNote.bind(todo));
+    new Todo();
 });
 
 // // Storage

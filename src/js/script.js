@@ -6,10 +6,20 @@ class Todo {
             titleField: document.querySelector('.sidebar__title'),
             dateField: document.querySelector('.sidebar__date'),
             descField: document.querySelector('.sidebar__desc'),
+            // Buttons
+            saveBtn: document.querySelector('.sidebar__save'),
+            delBtn: document.querySelector('.sidebar__del'),
+            newNoteBtn: document.querySelector('.main__btn-new'),
             // Body
             body: document.querySelector('.main__body'),
             tabsList: document.querySelector('.main__tabs')
-        }
+        };
+        this.options.tabsList.addEventListener('click', this.clickToTab.bind(this));
+        this.options.newNoteBtn.addEventListener('click', this.createNewNote.bind(this));
+        this.options.saveBtn.addEventListener('click', this.saveNewNote.bind(this));
+        this.options.delBtn.addEventListener('click', this.deleteNote.bind(this));
+
+        this.initTabs();
     }
 
     getNotes() {
@@ -29,9 +39,11 @@ class Todo {
         });
         const active = document.querySelector('.main__button--active');
         if (active) {
-            active.click()
+            active.click();
+            const id = active.getAttribute('id');
+            this.showCurrentNoteInfo(id);
         } else {
-            this.createNewNote()
+            this.createNewNote();
         }
     }
 
@@ -43,11 +55,12 @@ class Todo {
         this.options.titleField.value ='';
         this.options.dateField.value ='';
         this.options.descField.value ='';
+        this.options.body.innerHTML = '';
         this.options.tabsList.innerHTML += `<button class="main__button main__button--active">New note</button>`;
     }
 
     saveNewNote() {
-        let arr = JSON.parse(localStorage.getItem('notes')) || [];
+        let arr = this.getNotes();
         let newNote = {
             id: Math.random(),
             title: this.options.titleField.value,
@@ -63,18 +76,30 @@ class Todo {
     deleteNote() {
         const activeBtn = document.querySelector('.main__button--active');
         const noteId = activeBtn.getAttribute('id');
-        let arr = JSON.parse(localStorage.getItem('notes'));
+        let arr = this.getNotes();
         const result = arr.filter( item => item.id !== Number(noteId) );
         localStorage.clear();
         localStorage.setItem('notes', JSON.stringify(result));
         this.initTabs();
     }
 
-    showCurrentNoteInfo(note) {
+    showCurrentNoteInfo(id) {
+        const storage = this.getNotes();
+        const currentNote = storage.find( item => item.id === Number(id) );
         this.options.body.innerHTML = `
-            <h3>${note.title} <span>${note.date}</span></h3>
-            <p>${note.desc}</p>
+            <h3>${currentNote.title} <span>${currentNote.date}</span></h3>
+            <p>${currentNote.desc}</p>
         `
+    }
+
+    clickToTab(event) {
+        if (event.target.classList.contains('main__button')) {
+            const id = event.target.getAttribute('id');
+            const active = document.querySelector('.main__button--active');
+            active.classList.remove('main__button--active');
+            event.target.classList.add('main__button--active');
+            this.showCurrentNoteInfo(id);
+        }
     }
 
 }
@@ -82,15 +107,7 @@ class Todo {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const saveBtn = document.querySelector('.sidebar__save');
-    const delBtn = document.querySelector('.sidebar__del');
-    const newNoteBtn = document.querySelector('.main__btn-new');
-    const todo = new Todo();
-
-    todo.initTabs();
-    newNoteBtn.addEventListener('click', todo.createNewNote.bind(todo));
-    saveBtn.addEventListener('click', todo.saveNewNote.bind(todo));
-    delBtn.addEventListener('click',todo.deleteNote.bind(todo));
+    new Todo();
 });
 
 
