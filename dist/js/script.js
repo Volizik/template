@@ -23,7 +23,7 @@ var Todo = function () {
         };
         this.options.tabsList.addEventListener('click', this.clickToTab.bind(this));
         this.options.newNoteBtn.addEventListener('click', this.createNewNote.bind(this));
-        this.options.saveBtn.addEventListener('click', this.saveNewNote.bind(this));
+        this.options.saveBtn.addEventListener('click', this.saveNote.bind(this));
         this.options.delBtn.addEventListener('click', this.deleteNote.bind(this));
 
         this.initTabs();
@@ -59,27 +59,49 @@ var Todo = function () {
         value: function createNewNote() {
             var active = document.querySelector('.main__button--active');
             if (active) {
+                if (!active.getAttribute('id')) {
+                    // Если уже идет процесс создания заметки
+                    return false;
+                }
                 active.classList.remove('main__button--active');
             }
             this.options.titleField.value = '';
-            this.options.dateField.value = '';
+            this.options.dateField.value = new Date(Date.now()).toLocaleString('ru-RU');
             this.options.descField.value = '';
             this.options.body.innerHTML = '';
             this.options.tabsList.innerHTML += '<button class="main__button main__button--active">New note</button>';
         }
     }, {
-        key: 'saveNewNote',
-        value: function saveNewNote() {
+        key: 'saveNote',
+        value: function saveNote() {
+            var active = document.querySelector('.main__button--active');
+            var id = active.getAttribute('id');
             var arr = this.getNotes();
-            var newNote = {
-                id: Math.random(),
-                title: this.options.titleField.value,
-                date: this.options.dateField.value,
-                desc: this.options.descField.value
-            };
-            arr.push(newNote);
-            localStorage.clear();
-            localStorage.setItem('notes', JSON.stringify(arr));
+            if (id) {
+                var newNote = {
+                    id: Number(id),
+                    title: this.options.titleField.value,
+                    date: this.options.dateField.value,
+                    desc: this.options.descField.value
+                };
+                var currentNote = arr.find(function (note) {
+                    return note.id === Number(id);
+                });
+                var index = arr.indexOf(currentNote);
+                arr[index] = newNote;
+                localStorage.clear();
+                localStorage.setItem('notes', JSON.stringify(arr));
+            } else {
+                var _newNote = {
+                    id: Math.random(),
+                    title: this.options.titleField.value,
+                    date: this.options.dateField.value,
+                    desc: this.options.descField.value
+                };
+                arr.push(_newNote);
+                localStorage.clear();
+                localStorage.setItem('notes', JSON.stringify(arr));
+            }
             this.initTabs();
         }
     }, {
@@ -103,16 +125,30 @@ var Todo = function () {
                 return item.id === Number(id);
             });
             this.options.body.innerHTML = '\n            <h3>' + currentNote.title + ' <span>' + currentNote.date + '</span></h3>\n            <p>' + currentNote.desc + '</p>\n        ';
+            this.options.titleField.value = currentNote.title;
+            this.options.dateField.value = currentNote.date;
+            this.options.descField.value = currentNote.desc;
         }
     }, {
         key: 'clickToTab',
         value: function clickToTab(event) {
+            var buttons = document.querySelectorAll('.main__button');
             if (event.target.classList.contains('main__button')) {
                 var id = event.target.getAttribute('id');
                 var active = document.querySelector('.main__button--active');
-                active.classList.remove('main__button--active');
-                event.target.classList.add('main__button--active');
-                this.showCurrentNoteInfo(id);
+                if (active.getAttribute('id')) {
+                    active.classList.remove('main__button--active');
+                    event.target.classList.add('main__button--active');
+                    this.showCurrentNoteInfo(id);
+                } else {
+                    // Если это создание новой заметки
+                    if (buttons.length > 1) {
+                        // Если заметок больше чем одна
+                        active.remove();
+                        event.target.classList.add('main__button--active');
+                        this.showCurrentNoteInfo(id);
+                    }
+                }
             }
         }
     }]);
@@ -123,98 +159,4 @@ var Todo = function () {
 document.addEventListener('DOMContentLoaded', function () {
     new Todo();
 });
-
-// // Storage
-// let storage = JSON.parse(localStorage.getItem('notes')) || [];
-//
-// function showCurrentNote(note) {
-//     const body = document.querySelector('.main__body');
-//     body.innerHTML = `
-//             <h3>${note.title} <span>${note.date}</span></h3>
-//             <p>${note.desc}</p>
-//         `
-// }
-//
-// function showNote(el) {
-//     const id = el.getAttribute('id');
-//     storage.forEach((note) => {
-//         if (note.id === Number(id)) {
-//             showCurrentNote(note);
-//             console.log(note);
-//         }
-//     })
-// }
-//
-// document.addEventListener('DOMContentLoaded', () => {
-//
-//     // Fields
-//     const titleField = document.querySelector('.sidebar__title');
-//     const dateField = document.querySelector('.sidebar__date');
-//     const descField = document.querySelector('.sidebar__desc');
-//     // Buttons
-//     const addBtn = document.querySelector('.sidebar__save');
-//     const newBtn = document.querySelector('.main__btn-new');
-//     const delBtn = document.querySelector('.sidebar__del');
-//     let tabs;
-//     // Body
-//     const body = document.querySelector('.main__body');
-//     const tabsList = document.querySelector('.main__tabs');
-//
-//     let newNote = {
-//         id: Math.random(),
-//         title: titleField.value,
-//         date: dateField.value,
-//         desc: descField.value
-//     };
-//
-//
-//     function init() {
-//         if (storage.length > 0) {
-//             createTabs()
-//         } else {
-//             body.innerHTML = '<h3 style="text-align: center">Нет сохраненных заметок. Создайте новую!</h3>'
-//         }
-//     }
-//
-//     function saveNote() {
-//         let arr = JSON.parse(localStorage.getItem('notes')) || [];
-//         newNote = {
-//             id: Math.random(),
-//             title: titleField.value,
-//             date: dateField.value,
-//             desc: descField.value
-//         };
-//         arr.push(newNote);
-//         localStorage.clear();
-//         localStorage.setItem('notes', JSON.stringify(arr));
-//         storage = JSON.parse(localStorage.getItem('notes'));
-//         createTabs()
-//     }
-//
-//     function createTabs() {
-//         const stor = JSON.parse(localStorage.getItem('notes')) || [];
-//         tabsList.innerHTML = '';
-//         stor.forEach((note, index) => {
-//             tabsList.innerHTML += `<button
-//                                     class="main__button ${storage.length - 1 === index ? 'main__button--active' : ''}"
-//                                     id=${note.id}
-//                                     onclick="showNote(event.target)"
-//                                     >№${index + 1}
-//                                     </button>`;
-//         });
-//         tabs = document.querySelector('.main__tab');
-//
-//         const active = document.querySelector('.main__button--active');
-//         active.click()
-//     }
-//
-//
-//     init();
-//
-//     addBtn.addEventListener('click', () => {
-//         saveNote()
-//     });
-//
-//
-// });
 //# sourceMappingURL=script.js.map
