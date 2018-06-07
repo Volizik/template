@@ -77,6 +77,10 @@ var Todo = function () {
             var active = document.querySelector('.main__button--active');
             var id = active.getAttribute('id');
             var arr = this.getNotes();
+            var isValid = this.validation();
+            if (!isValid) {
+                return false;
+            }
             if (id) {
                 var newNote = {
                     id: Number(id),
@@ -91,6 +95,7 @@ var Todo = function () {
                 arr[index] = newNote;
                 localStorage.clear();
                 localStorage.setItem('notes', JSON.stringify(arr));
+                this.options.body.innerHTML = '\n                <h3>' + newNote.title + ' <span>' + newNote.date + '</span></h3>\n                <p>' + newNote.desc + '</p>\n            ';
             } else {
                 var _newNote = {
                     id: Math.random(),
@@ -101,12 +106,16 @@ var Todo = function () {
                 arr.push(_newNote);
                 localStorage.clear();
                 localStorage.setItem('notes', JSON.stringify(arr));
+                this.initTabs();
             }
-            this.initTabs();
         }
     }, {
         key: 'deleteNote',
         value: function deleteNote() {
+            var del = confirm('Вы действительно хотите удалить заметку?');
+            if (!del) {
+                return;
+            }
             var activeBtn = document.querySelector('.main__button--active');
             var noteId = activeBtn.getAttribute('id');
             var arr = this.getNotes();
@@ -150,6 +159,15 @@ var Todo = function () {
                     }
                 }
             }
+        }
+    }, {
+        key: 'validation',
+        value: function validation() {
+            if (this.options.titleField.value.trim() === '' || this.options.descField.value.trim() === '') {
+                alert('Все поля должны быть заполнены!');
+                return;
+            }
+            return true;
         }
     }]);
 

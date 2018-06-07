@@ -67,6 +67,10 @@ class Todo {
         const active = document.querySelector('.main__button--active');
         const id = active.getAttribute('id');
         let arr = this.getNotes();
+        let isValid = this.validation();
+        if (!isValid) {
+            return false;
+        }
         if (id) {
             let newNote = {
                 id: Number(id),
@@ -79,6 +83,10 @@ class Todo {
             arr[index] = newNote;
             localStorage.clear();
             localStorage.setItem('notes', JSON.stringify(arr));
+            this.options.body.innerHTML = `
+                <h3>${newNote.title} <span>${newNote.date}</span></h3>
+                <p>${newNote.desc}</p>
+            `;
         } else {
             let newNote = {
                 id: Math.random(),
@@ -89,11 +97,15 @@ class Todo {
             arr.push(newNote);
             localStorage.clear();
             localStorage.setItem('notes', JSON.stringify(arr));
+            this.initTabs();
         }
-        this.initTabs();
     }
 
     deleteNote() {
+        let del = confirm('Вы действительно хотите удалить заметку?');
+        if (!del) {
+            return;
+        }
         const activeBtn = document.querySelector('.main__button--active');
         const noteId = activeBtn.getAttribute('id');
         let arr = this.getNotes();
@@ -136,6 +148,13 @@ class Todo {
         }
     }
 
+    validation() {
+        if (this.options.titleField.value.trim() === '' || this.options.descField.value.trim() === '') {
+            alert('Все поля должны быть заполнены!');
+            return;
+        }
+        return true;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
